@@ -64,9 +64,6 @@ assert WikiUrl() == str(Url(scheme='https', authority='wikipedia.org'))
 assert WikiUrl(path=['wiki', 'python']) == 'https://wikipedia.org/wiki/python'
 assert GoogleUrl(query={'q': 'python', 'result': 'json'}) == 'https://google.com?q=python&result=json'
 
-# g = GoogleUrl(query={'q': 'python', 'result': 'json'})
-# w = WikiUrl(path=['wiki', 'python'])
-# print(g, w)
 
 # Реализовать класс UrlCreator, с помощью которого можно будет создавать Url:
 # При вызове метода _create должен возвращать Url
@@ -88,13 +85,6 @@ class UrlCreator:
     def _create(self):
         return Url(scheme=self.scheme, authority=self.authority, path=self.path, query=self.query,
                    fragment=self.fragment)
-
-    # def __getattr__(self, name):
-    #     if self.path:
-    #         self.path.append(name)
-    #     else:
-    #         self.path = [name]
-    #     return UrlCreator(scheme=self.scheme, authority=self.authority, path=self.path)
 
 
     def __str__(self):
@@ -119,22 +109,17 @@ class UrlCreator:
 
     def __call__(self, *args, **kwargs):
 
-        def varname(var):
-            return [name for name in globals() if globals()[name] is var][0]
-
-        arg_name = [varname(arg) for arg in args]
-
         if self.path:
-            self.path += arg_name
+            p = self.path + [arg for arg in args]
         else:
-            self.path = arg_name
+            p = [arg for arg in args]
 
         if self.query:
-            self.query.update({k: v for k, v in kwargs.items()})
+            q = self.query.update({k: v for k, v in kwargs.items()})
         else:
-            self.query = {k: v for k, v in kwargs.items()}
+            q = {k: v for k, v in kwargs.items()}
 
-        return self
+        return UrlCreator(self.scheme, self.authority, path=p, query=q)
 
     def __getattr__(self, name):
         if self.path:
@@ -147,7 +132,10 @@ class UrlCreator:
 
 url_creator = UrlCreator(scheme='https', authority='docs.python.org')
 assert url_creator.docs.v1.api.list == 'https://docs.python.org/docs/v1/api/list'
-assert url_creator(api,v1,list) == 'https://docs.python.org/api/v1/list'
+assert url_creator('api','v1','list') == 'https://docs.python.org/api/v1/list'
+assert url_creator('api','v1','list', q='my_list') == 'https://docs.python.org/api/v1/list?q=my_list'
+assert url_creator('3').search(q='getattr', check_keywords='yes', area='default')._create()  ==\
+       'https://docs.python.org/3/search?q=getattr&check_keywords=yes&area=default'
 
 
 
