@@ -14,16 +14,36 @@ def whoami():
     server_time = time.strftime('%A %B, %d %Y %H:%M:%S')
 
     return f"""
-    <h4/> User browser: {user_agent} </h4> 
-    <h4/> IP_address: {ip_address} </h4>
-    <h4/> Server time: {server_time} </h4>
+    <head>
+        <title> User info </title>
+    </head>
+    <body>
+        <p> User browser: {user_agent} </p>
+        <p> IP_address: {ip_address} </p>
+        <p> Server time: {server_time} </p>
+    </body>
     """
 
 @app.route("/source_code/")
 def source_code():
     with open("app.py", "r") as f:
-        result = f.read()
-    return result
+        result = f.readlines()
+
+    result = [lines + '<br>' for lines in result]
+
+    result = ''.join(result)
+
+    return f'''
+    <head>
+        <title> Source code </title>
+    </head>
+    <body>
+        
+        {result}
+     </body>
+     '''
+
+
 
 @app.route("/random/")
 def random_string():
