@@ -13,37 +13,78 @@ def whoami():
     ip_address = request.remote_addr
     server_time = time.strftime('%A %B, %d %Y %H:%M:%S')
 
-    return f"""
+    return """
+    <html>
     <head>
-        <title> User info </title>
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+    </style>
     </head>
     <body>
-        <p> User browser: {user_agent} </p>
-        <p> IP_address: {ip_address} </p>
-        <p> Server time: {server_time} </p>
+    <div class="container">
+    <table class="table">
+    <tr>
+        <th>User browser</th>
+        <td>%s</td>
+    </tr>
+    <tr>
+        <th>IP address</th>
+        <td>%s</td>
+    </tr>
+     <tr>
+        <th>Server time</th>
+        <td>%s</td>
+    </tr>
+    </table>
+    </div>
     </body>
-    """
+    </html> 
+    """ % (user_agent, ip_address, server_time)
 
 @app.route("/source_code/")
 def source_code():
     with open("app.py", "r") as f:
-        result = f.readlines()
+        result = f.read()
 
-    result = [lines + '<br>' for lines in result]
-
-    result = ''.join(result)
+    result = result.replace('<', '&lt')
 
     return f'''
     <head>
         <title> Source code </title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
     </head>
     <body>
+    <br> <br> <br>
+    <div class="container-fluid d-flex align-items-center justify-content-center">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
+    Press for source code
+    </button>
+    </div>
+    <div class="modal" id="myModal">
+          <div class="modal-dialog">
+            <div class="modal-content">
+   
+              <!-- Modal Header -->
+              <div class="modal-header">
+                <h4 class="modal-title">Source code Flask app</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <!-- Modal body -->
+              <div class="modal-body"; style="white-space: pre">
+                %s
+              </div>
         
-        {result}
-     </body>
-     '''
-
-
+              <!-- Modal footer -->
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+    </div>
+    </body>
+     ''' % result
 
 @app.route("/random/")
 def random_string():
@@ -67,4 +108,21 @@ def random_string():
 
     ans_str = ''.join(random.choice(symbols) for i in range(int(length)))
 
-    return ans_str
+    return """
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    </head>
+    <body>
+    <br> <br> <br>
+    <div class="container-fluid d-flex align-items-center justify-content-center">
+    <button data-bs-toggle="collapse" data-bs-target="#demo">%s random symbols</button>
+    </div>
+    <div id="demo" class="collapse">
+    <div class="container-fluid d-flex align-items-center justify-content-center">
+    <p>%s</p>
+    </div>
+    </div>
+    </body>
+    """ % (length, ans_str)
