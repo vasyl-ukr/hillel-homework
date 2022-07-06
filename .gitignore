@@ -1,7 +1,7 @@
 # Python
 *.pyc
 *~
-__pycache__
+flask_app/__pycache__/
 
 # Env
 .env
