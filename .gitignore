@@ -2,6 +2,9 @@
 *.pyc
 *~
 __pycache__
+flask_app/__pycache__/
+
+test.txt
 
 # Env
 .env
